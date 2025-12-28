@@ -26,6 +26,26 @@ const Navbar = () => {
         setHoveredIndex(null);
     };
 
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    const controlNavbar = () => {
+        if (window.scrollY  > lastScrollY && window.scrollY > 120) {
+            console.log(window.scrollY)
+            setIsVisible(false);
+        } else {
+            setIsVisible(true);
+        }
+        setLastScrollY(window.scrollY);
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', controlNavbar);
+        return () => {
+            window.removeEventListener('scroll', controlNavbar);
+        };
+    }, [lastScrollY]);
+
     const getPillStyle = () => {
         if (!hoveredRect || !navRef.current) return { opacity: 0 };
 
@@ -40,7 +60,7 @@ const Navbar = () => {
 
     return (
         <div className='relative z-50'>
-            <nav className="flex absolute w-[95%] top-8 bg-white shadow-[0_4px_16px_-1px_rgba(0,0,0,0.15)] h-[40px] rounded-[22px] mx-8 items-center justify-between px-8 py-4 ">
+            <nav className={`flex fixed w-[95%] transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-[200%]'} top-8 bg-white shadow-[0_4px_16px_-1px_rgba(0,0,0,0.15)] h-[40px] rounded-[22px] max-md:left-3 md:mx-8   items-center justify-between px-8 py-4 `}>
                 <a className="flex items-center" href="/">
                     <img
                         alt="Studio.ai logo"
@@ -52,18 +72,14 @@ const Navbar = () => {
 
                 <div
                     ref={navRef}
-                    className="hidden md:flex items-center relative gap-1 text-sm font-semibold text-gray-800"
+                    className="hidden md:flex overflow-hidden  items-center relative gap-1 text-sm font-semibold text-gray-800"
                     onMouseLeave={handleMouseLeave}
                 >
                     <div
-                        className="absolute left-0 bg-gradient-to-r from-rose-200 to-rose-300 rounded-full transition-all duration-300 ease-in-out pointer-events-none"
+                        className="absolute left-0  bg-gradient-to-r from-rose-200 to-rose-300 rounded-full transition-all duration-300 ease-in-out pointer-events-none"
                         style={{
                             ...getPillStyle(),
-                            // Position it vertically aligned with items (items are vertically centered in flex row)
-                            // We use relative positioning via transform, so top-0 is fine because items are full height in the flex container? 
-                            // Actually, explicit top value might be needed if items have margin. 
-                            // But usually, putting it at top-0 of the container and using translate works if container is relative.
-                            top: hoveredRect && navRef.current ? hoveredRect.top - navRef.current.getBoundingClientRect().top : 0
+                            //   top: hoveredRect && navRef.current ? hoveredRect.top - navRef.current.getBoundingClientRect().top : 0 
                         }}
                     ></div>
 
@@ -83,7 +99,7 @@ const Navbar = () => {
 
                 <div className="flex items-center gap-6">
                     <a href="#" className="text-sm font-bold text-gray-900 hover:text-gray-600">Log in</a>
-                    <button className="bg-black text-white px-5 h-[40px] rounded-full text-sm font-semibold  transition-all duration-300 ease-in-out">
+                    <button className="bg-black text-white px-5 h-[38px] rounded-full text-sm font-semibold  transition-all duration-300 ease-in-out">
                         Sign up
                     </button>
                 </div>

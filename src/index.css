@@ -1,1 +1,48 @@
-@import "tailwindcss"
+@import url('https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&family=Poppins:wght@400;600;800&display=swap');
+@import "tailwindcss";
+
+
+@layer utilities {
+        .text-shine {
+            background: linear-gradient(110deg, #f74ca4 0%, #ec367f 45%, #fff 50%, #ec36a3 55%, #f74cdd 100%) no-repeat 0 0 / 250px;
+        background-clip: text;
+        -webkit-text-fill-color: rgba(193, 85, 141, 0.6);
+        animation: shine 2.5s ease-in infinite;
+    }
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+@theme {
+   --font-pop:"Poppins",sans-serif;
+   --font-gold:"Goldman",sans-serif;
+}
+::-webkit-scrollbar{
+  display: none;
+}
+
+@theme {
+    --animate-blob: blob 7s infinite;
+
+    @keyframes blob {
+        0% {
+            transform: translate(0px, 0px) scale(1);
+        }
+
+        33% {
+            transform: translate(30px, -50px) scale(1.1);
+        }
+
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
+
+        100% {
+            transform: translate(0px, 0px) scale(1);
+        }
+    }
+}
