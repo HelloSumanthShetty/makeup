@@ -1,5 +1,29 @@
 import { Eye, Smile, Scissors, EyeClosed } from 'lucide-react';
 
+import eyeshadowMask from '../assets/eyesshadow/eyeshadow.png';
+import shadowBasic from '../assets/eyesshadow/basic.png';
+import shadowSmokey from '../assets/eyesshadow/smokey.png';
+import shadowCrease from '../assets/eyesshadow/crease.png';
+import shadowWinged from '../assets/eyesshadow/winged.png';
+import linerThin from '../assets/eyeliner/thin.png';
+import linerThick from '../assets/eyeliner/thick.png';
+import linerCat from '../assets/eyeliner/cat.png';
+import linerDouble from '../assets/eyeliner/double.png';
+import mascaraNatural from '../assets/mascara/Natural.png';
+import mascaraVolume from '../assets/mascara/volume.png';
+import mascaraLength from '../assets/mascara/lightning.png';
+import blushApples from '../assets/blush/apples.png';
+import blushLifted from '../assets/blush/lifted.png';
+import blushSunburn from '../assets/blush/sunkissed.png';
+import lipstickMatte from '../assets/lips/matte.png';
+import lipstickSatin from '../assets/lips/satin.png';
+import lipstickGloss from '../assets/lips/glossy.png';
+import liplinerMask from '../assets/lips/lipliner.png';
+import browNatural from '../assets/Eyebrows/natural.png';
+import browArched from '../assets/Eyebrows/arched.png';
+import browStraight from '../assets/Eyebrows/straight.png';
+import browThin from '../assets/Eyebrows/thin.png';
+
 export interface RenderConfig {
     blendMode?: 'normal' | 'multiply' | 'overlay' | 'soft-light' | 'color' | 'screen';
     opacity?: number; // Base opacity
@@ -64,7 +88,7 @@ export const MAKEUP_DATA: MainCategory[] = [
                         region: 'upper_lid',
                         render: {
                             blendMode: 'multiply',
-                            mask: 'masks/eyeshadow.png'
+                            mask: eyeshadowMask
                         },
                         colors: [
                             '#4A3B32', '#8B5A2B', '#CDAF95', // Nudes
@@ -81,10 +105,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: 'basic',
                         region: 'upper_lid',
                         options: [
-                            { id: 'basic', value: 'basic', label: 'Basic', render: { mask: 'masks/shadow_basic.png' } },
-                            { id: 'smokey', value: 'smokey', label: 'Smokey', render: { mask: 'masks/shadow_smokey.png' } },
-                            { id: 'crease', value: 'crease', label: 'Cut Crease', render: { mask: 'masks/shadow_crease.png' } },
-                            { id: 'winged', value: 'winged', label: 'Winged', render: { mask: 'masks/shadow_winged.png' } }
+                            { id: 'basic', value: 'basic', label: 'Basic', render: { mask: shadowBasic } },
+                            { id: 'smokey', value: 'smokey', label: 'Smokey', render: { mask: shadowSmokey } },
+                            { id: 'crease', value: 'crease', label: 'Cut Crease', render: { mask: shadowCrease } },
+                            { id: 'winged', value: 'winged', label: 'Winged', render: { mask: shadowWinged } }
                         ]
                     },
                     {
@@ -113,10 +137,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                         region: 'upper_lid',
                         render: { blendMode: 'normal' },
                         options: [
-                            { id: 'thin', value: 'thin', label: 'Thin', render: { mask: 'masks/liner_thin.png' } },
-                            { id: 'thick', value: 'thick', label: 'Thick', render: { mask: 'masks/liner_thick.png' } },
-                            { id: 'cat_eye', value: 'cat_eye', label: 'Cat Eye', render: { mask: 'masks/liner_cat.png' } },
-                            { id: 'double', value: 'double', label: 'Double', render: { mask: 'masks/liner_double.png' } }
+                            { id: 'thin', value: 'thin', label: 'Thin', render: { mask: linerThin } },
+                            { id: 'thick', value: 'thick', label: 'Thick', render: { mask: linerThick } },
+                            { id: 'cat_eye', value: 'cat_eye', label: 'Cat Eye', render: { mask: linerCat } },
+                            { id: 'double', value: 'double', label: 'Double', render: { mask: linerDouble } }
                         ]
                     },
                     {
@@ -144,9 +168,9 @@ export const MAKEUP_DATA: MainCategory[] = [
                         region: 'lashes',
                         render: { blendMode: 'multiply' },
                         options: [
-                            { id: 'natural', value: 'natural', label: 'Natural', render: { mask: 'masks/mascara_natural.png' } },
-                            { id: 'volume', value: 'volume', label: 'Volume', render: { mask: 'masks/mascara_volume.png' } },
-                            { id: 'length', value: 'length', label: 'Lengthening', render: { mask: 'masks/mascara_length.png' } }
+                            { id: 'natural', value: 'natural', label: 'Natural', render: { mask: mascaraNatural } },
+                            { id: 'volume', value: 'volume', label: 'Volume', render: { mask: mascaraVolume } },
+                            { id: 'length', value: 'length', label: 'Lengthening', render: { mask: mascaraLength } }
                         ]
                     }
                 ]
@@ -226,9 +250,9 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: 'apples',
                         region: 'cheeks',
                         options: [
-                            { id: 'apples', value: 'apples', label: 'Apples', render: { mask: 'masks/blush_apples.png' } },
-                            { id: 'lifted', value: 'lifted', label: 'Lifted', render: { mask: 'masks/blush_lifted.png' } },
-                            { id: 'sunburn', value: 'sunburn', label: 'Sunkissed', render: { mask: 'masks/blush_sunburn.png' } }
+                            { id: 'apples', value: 'apples', label: 'Apples', render: { mask: blushApples } },
+                            { id: 'lifted', value: 'lifted', label: 'Lifted', render: { mask: blushLifted } },
+                            { id: 'sunburn', value: 'sunburn', label: 'Sunkissed', render: { mask: blushSunburn } }
                         ]
                     }
                 ]
@@ -282,9 +306,9 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: 'matte',
                         region: 'lips',
                         options: [
-                            { id: 'matte', value: 'matte', label: 'Matte', render : { mask : 'masks/lipstick_matte.png' } },
-                            { id: 'satin', value: 'satin', label: 'Satin', render : { mask : 'masks/lipstick_satin.png' } },
-                            { id: 'gloss', value: 'gloss', label: 'High Gloss', render : { mask : 'masks/lipstick_gloss.png' } }
+                            { id: 'matte', value: 'matte', label: 'Matte', render: { mask: lipstickMatte } },
+                            { id: 'satin', value: 'satin', label: 'Satin', render: { mask: lipstickSatin } },
+                            { id: 'gloss', value: 'gloss', label: 'High Gloss', render: { mask: lipstickGloss } }
                         ]
                     }
                 ]
@@ -300,7 +324,7 @@ export const MAKEUP_DATA: MainCategory[] = [
                         zIndex: 16,
                         defaultValue: null,
                         region: 'lips',
-                        render: { blendMode: 'normal', mask: 'masks/lipliner.png' },
+                        render: { blendMode: 'normal', mask: liplinerMask },
                         colors: ['#8B0000', '#A52A2A', '#800000']
                     }
                 ]
@@ -340,10 +364,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: 'natural',
                         region: 'brows',
                         options: [
-                            { id: 'natural', value: 'natural', label: 'Natural', render: { mask: 'masks/brow_natural.png' } },
-                            { id: 'arched', value: 'arched', label: 'Arched', render: { mask: 'masks/brow_arched.png' } },
-                            { id: 'straight', value: 'straight', label: 'Straight', render: { mask: 'masks/brow_straight.png' } },
-                            { id: 'thin', value: 'thin', label: 'Thin 90s', render: { mask: 'masks/brow_thin.png' } }
+                            { id: 'natural', value: 'natural', label: 'Natural', render: { mask: browNatural } },
+                            { id: 'arched', value: 'arched', label: 'Arched', render: { mask: browArched } },
+                            { id: 'straight', value: 'straight', label: 'Straight', render: { mask: browStraight } },
+                            { id: 'thin', value: 'thin', label: 'Thin 90s', render: { mask: browThin } }
                         ]
                     }
                 ]
