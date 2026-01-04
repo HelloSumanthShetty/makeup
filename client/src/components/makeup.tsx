@@ -73,21 +73,28 @@ const Makeup = () => {
         allTabs.forEach(subCat => {
             subCat.features.forEach(feature => {
                 const val = makeupState[feature.id];
-                if (val && val !== feature.defaultValue) {
-                    let valueLabel = val;
+                
+                if (val !== undefined && val !== null && val !== feature.defaultValue) {
+                    let valueLabel: string = String(val);
+
                     if (feature.type === 'color' && feature.colors) {
-                        valueLabel = "custom color " + val;
+                        const colorMatch = feature.colors.find(c => c.hex === val);
+                        valueLabel = colorMatch ? colorMatch.name : `custom color ${val}`;
                     }
                     if (feature.options) {
                         const opt = feature.options.find(o => o.value === val);
                         if (opt) valueLabel = opt.label || val;
                     }
                     if (feature.type === 'slider') {
-                        valueLabel = `${val * 100}% intensity`;
+                        valueLabel = `${Math.round(val * 100)}%`;
                     }
 
                     const subject = feature.label.toLowerCase();
-                    if (subject === 'pattern' || subject === 'shape' || subject === 'style') {
+
+                    // Special handling for slider/intensity types
+                    if (feature.type === 'slider') {
+                        parts.push(`apply ${valueLabel} intensity ${subCat.label.toLowerCase()}`);
+                    } else if (subject === 'pattern' || subject === 'shape' || subject === 'style') {
                         parts.push(`add ${valueLabel} ${subCat.label.toLowerCase()}`);
                     } else if (subject === 'color' || subject === 'shade') {
                         parts.push(`change ${subCat.label.toLowerCase()} color to ${valueLabel}`);
@@ -204,7 +211,7 @@ const Makeup = () => {
         setErrorMessage(null);
 
         const prompt = generateMakeupPrompt();
-
+        console.log(prompt)
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/makeup/process`, {
                 method: 'POST',
@@ -253,12 +260,12 @@ const Makeup = () => {
                         <div className="flex flex-wrap gap-3">
                             {feature.colors?.map((color) => (
                                 <button
-                                    key={color}
-                                    onClick={() => handleFeatureChange(feature.id, value === color ? null : color)}
-                                    className={`w-8 h-8 rounded-full border-2 transition-all ${value === color ? 'border-purple-600 scale-110 shadow-md' : 'border-transparent hover:scale-105'
+                                    key={color.hex}
+                                    onClick={() => handleFeatureChange(feature.id, value === color.hex ? null : color.hex)}
+                                    className={`w-8 h-8 rounded-full border-2 transition-all ${value === color.hex ? 'border-purple-600 scale-110 shadow-md' : 'border-transparent hover:scale-105'
                                         }`}
-                                    style={{ backgroundColor: color }}
-                                    title={color}
+                                    style={{ backgroundColor: color.hex }}
+                                    title={color.name}
                                 />
                             ))}
                             <button

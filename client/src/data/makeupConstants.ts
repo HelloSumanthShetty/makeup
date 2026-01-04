@@ -41,6 +41,11 @@ export interface MakeupOption {
     render?: RenderConfig; // Option-specific overrides
 }
 
+export interface ColorOption {
+    hex: string;
+    name: string;
+}
+
 export interface MakeupFeature {
     id: string;
     label: string;
@@ -51,7 +56,7 @@ export interface MakeupFeature {
     defaultValue: any;  // null implies "natural state"
     zIndex: number;     // Critical for layering
     options?: MakeupOption[];
-    colors?: string[];  // Quick access for solid colors
+    colors?: ColorOption[];  // Named colors with hex and name
     render?: RenderConfig; // Default render config for this feature
     region?: MakeupRegion;
 }
@@ -91,10 +96,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                             mask: eyeshadowMask
                         },
                         colors: [
-                            '#4A3B32', '#8B5A2B', '#CDAF95', // Nudes
-                            '#2F1B1B', '#5C3A3A', '#9E6F6F', // Reds/Pinks
-                            '#1A2B3C', '#2F4F4F', '#4682B4', // Blues
-                            '#2E0854', '#4B0082', '#8A2BE2'  // Purples
+                            { hex: '#4A3B32', name: 'Cocoa' }, { hex: '#8B5A2B', name: 'Bronze' }, { hex: '#CDAF95', name: 'Nude' },
+                            { hex: '#2F1B1B', name: 'Burgundy' }, { hex: '#5C3A3A', name: 'Rosewood' }, { hex: '#9E6F6F', name: 'Blush' },
+                            { hex: '#1A2B3C', name: 'Navy' }, { hex: '#2F4F4F', name: 'Teal' }, { hex: '#4682B4', name: 'Sky Blue' },
+                            { hex: '#2E0854', name: 'Deep Purple' }, { hex: '#4B0082', name: 'Indigo' }, { hex: '#8A2BE2', name: 'Violet' }
                         ]
                     },
                     {
@@ -102,7 +107,7 @@ export const MAKEUP_DATA: MainCategory[] = [
                         label: 'Style',
                         type: 'pattern',
                         zIndex: 10,
-                        defaultValue: 'basic',
+                        defaultValue: null,
                         region: 'upper_lid',
                         options: [
                             { id: 'basic', value: 'basic', label: 'Basic', render: { mask: shadowBasic } },
@@ -118,7 +123,7 @@ export const MAKEUP_DATA: MainCategory[] = [
                         min: 0,
                         max: 1,
                         step: 0.1,
-                        defaultValue: 0.8,
+                        defaultValue: 0.5,
                         zIndex: 10,
                         region: 'upper_lid'
                     }
@@ -151,7 +156,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: '#000000',
                         region: 'upper_lid',
                         render: { blendMode: 'normal' },
-                        colors: ['#000000', '#3D2B1F', '#1A1A1A', '#000080']
+                        colors: [
+                            { hex: '#000000', name: 'Black' }, { hex: '#3D2B1F', name: 'Dark Brown' },
+                            { hex: '#1A1A1A', name: 'Charcoal' }, { hex: '#000080', name: 'Navy' }
+                        ]
                     }
                 ]
             },
@@ -187,7 +195,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: null,
                         region: 'iris',
                         render: { blendMode: 'overlay', opacity: 0.6 },
-                        colors: ['#634e34', '#2e5c8a', '#3d7a46', '#876c43', '#808080']
+                        colors: [
+                            { hex: '#634e34', name: 'Hazel' }, { hex: '#2e5c8a', name: 'Ocean Blue' },
+                            { hex: '#3d7a46', name: 'Forest Green' }, { hex: '#876c43', name: 'Amber' }, { hex: '#808080', name: 'Gray' }
+                        ]
                     }
                 ]
             }
@@ -211,8 +222,8 @@ export const MAKEUP_DATA: MainCategory[] = [
                         region: 'face',
                         render: { blendMode: 'normal', opacity: 0.4 },
                         colors: [
-                            '#F5DEB3', '#E6BC98', '#D2B48C', '#BC8F8F', // Fair/Light
-                            '#CD853F', '#8B4513', '#A0522D', '#5D4037'  // Medium/Dark
+                            { hex: '#F5DEB3', name: 'Porcelain' }, { hex: '#E6BC98', name: 'Ivory' }, { hex: '#D2B48C', name: 'Sand' }, { hex: '#BC8F8F', name: 'Rosy Beige' },
+                            { hex: '#CD853F', name: 'Caramel' }, { hex: '#8B4513', name: 'Mocha' }, { hex: '#A0522D', name: 'Chestnut' }, { hex: '#5D4037', name: 'Espresso' }
                         ]
                     },
                     {
@@ -240,14 +251,17 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: null,
                         region: 'cheeks',
                         render: { blendMode: 'multiply', opacity: 0.6 },
-                        colors: ['#FFB6C1', '#FF69B4', '#CD5C5C', '#E9967A', '#DB7093']
+                        colors: [
+                            { hex: '#FFB6C1', name: 'Baby Pink' }, { hex: '#FF69B4', name: 'Hot Pink' },
+                            { hex: '#CD5C5C', name: 'Indian Red' }, { hex: '#E9967A', name: 'Coral' }, { hex: '#DB7093', name: 'Dusty Rose' }
+                        ]
                     },
                     {
                         id: 'blush_pattern',
                         label: 'Placement',
                         type: 'pattern',
                         zIndex: 5,
-                        defaultValue: 'apples',
+                        defaultValue: null,
                         region: 'cheeks',
                         options: [
                             { id: 'apples', value: 'apples', label: 'Apples', render: { mask: blushApples } },
@@ -269,7 +283,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: null,
                         region: 'face',
                         render: { blendMode: 'multiply', opacity: 0.5 },
-                        colors: ['#8B5A2B', '#654321', '#5D4037', '#3E2723']
+                        colors: [
+                            { hex: '#8B5A2B', name: 'Bronze' }, { hex: '#654321', name: 'Dark Brown' },
+                            { hex: '#5D4037', name: 'Cocoa' }, { hex: '#3E2723', name: 'Espresso' }
+                        ]
                     }
                 ]
             }
@@ -293,9 +310,9 @@ export const MAKEUP_DATA: MainCategory[] = [
                         region: 'lips',
                         render: { blendMode: 'soft-light', opacity: 0.8 },
                         colors: [
-                            '#DC143C', '#B22222', '#800000', // Reds
-                            '#FF69B4', '#FF1493', '#C71585', // Pinks
-                            '#D2691E', '#8B4513', '#A0522D'  // Nudes/Browns
+                            { hex: '#DC143C', name: 'Crimson' }, { hex: '#B22222', name: 'Firebrick' }, { hex: '#800000', name: 'Maroon' },
+                            { hex: '#FF69B4', name: 'Hot Pink' }, { hex: '#FF1493', name: 'Fuchsia' }, { hex: '#C71585', name: 'Magenta' },
+                            { hex: '#D2691E', name: 'Nude' }, { hex: '#8B4513', name: 'Chocolate' }, { hex: '#A0522D', name: 'Caramel' }
                         ]
                     },
                     {
@@ -325,7 +342,9 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: null,
                         region: 'lips',
                         render: { blendMode: 'normal', mask: liplinerMask },
-                        colors: ['#8B0000', '#A52A2A', '#800000']
+                        colors: [
+                            { hex: '#8B0000', name: 'Dark Red' }, { hex: '#A52A2A', name: 'Brown' }, { hex: '#800000', name: 'Maroon' }
+                        ]
                     }
                 ]
             }
@@ -348,7 +367,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                         defaultValue: null,
                         region: 'brows',
                         render: { blendMode: 'multiply', opacity: 0.7 },
-                        colors: ['#000000', '#363636', '#594436', '#8B7355']
+                        colors: [
+                            { hex: '#000000', name: 'Black' }, { hex: '#363636', name: 'Charcoal' },
+                            { hex: '#594436', name: 'Dark Brown' }, { hex: '#8B7355', name: 'Medium Brown' }
+                        ]
                     }
                 ]
             },
@@ -392,10 +414,10 @@ export const MAKEUP_DATA: MainCategory[] = [
                         region: 'hair',
                         render: { blendMode: 'soft-light', opacity: 0.5 },
                         colors: [
-                            '#000000', '#2C222B', // Black/Dark Brown
-                            '#B55239', '#8D4004', // Red/Auburn
-                            '#E6CEA8', '#E3C179', // Blonde
-                            '#6A0DAD', '#FFC0CB'  // Funky
+                            { hex: '#000000', name: 'Jet Black' }, { hex: '#2C222B', name: 'Dark Brown' },
+                            { hex: '#B55239', name: 'Auburn' }, { hex: '#8D4004', name: 'Copper' },
+                            { hex: '#E6CEA8', name: 'Platinum' }, { hex: '#E3C179', name: 'Golden Blonde' },
+                            { hex: '#6A0DAD', name: 'Purple' }, { hex: '#FFC0CB', name: 'Pink' }
                         ]
                     }
                 ]
