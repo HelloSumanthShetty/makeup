@@ -40,7 +40,7 @@ const Makeup = () => {
                 return;
             }
 
-            const maxSize = 10 * 1024 * 1024; 
+            const maxSize = 10 * 1024 * 1024;
             if (file.size > maxSize) {
                 setErrorMessage('Image is too large. Maximum size is 10MB.');
                 setSidebarMessage({ text: 'Image too large. Max 10MB.', type: 'error' });
@@ -102,7 +102,7 @@ const Makeup = () => {
         return parts.join(" and ") + " to the image";
     };
 
-        const subscribeToJob = useCallback((requestId: string) => {
+    const subscribeToJob = useCallback((requestId: string) => {
         return new Promise<void>((resolve, reject) => {
             let isResolved = false;
             let channel: ReturnType<typeof supabase.channel> | null = null;
@@ -206,7 +206,7 @@ const Makeup = () => {
         const prompt = generateMakeupPrompt();
 
         try {
-            const response = await fetch('http://localhost:5000/api/makeup/process', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/makeup/process`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
