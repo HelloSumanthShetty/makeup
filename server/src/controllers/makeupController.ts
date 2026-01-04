@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { fal } from "@fal-ai/client";
-import { createJob, getJob, updateJob } from '../services/jobStore';
+import { createJob, getJob, updateJob, JobStatus } from '../services/jobStore';
 
 // Configure Fal.ai credentials from environment
 if (process.env.FAL_KEY) {
@@ -34,10 +34,6 @@ export const submitMakeup = async (req: Request, res: Response) => {
         // Read webhook URL directly from env (undefined = polling fallback)
         const webhookUrl = process.env.WEBHOOK_URL;
 
-        console.log(`Submitting to Fal.ai Queue...`);
-        console.log(`  Prompt: "${finalPrompt}"`);
-        console.log(`  Webhook: ${webhookUrl || 'NONE (polling mode)'}`);
-
         // Submit to Fal.ai Queue
         const { request_id } = await fal.queue.submit("fal-ai/nano-banana/edit", {
             input: {
@@ -49,9 +45,12 @@ export const submitMakeup = async (req: Request, res: Response) => {
             webhookUrl
         });
 
-        // Store job in our tracking system
-        createJob(request_id, finalPrompt);
-        console.log(`Job created with ID: ${request_id}`);
+        // Store job in Supabase
+        const job = await createJob(request_id, finalPrompt);
+        if (!job) {
+            console.error('Failed to create job in database');
+            return res.status(500).json({ error: 'Failed to create job record' });
+        }
 
         res.json({
             success: true,
@@ -70,7 +69,6 @@ export const submitMakeup = async (req: Request, res: Response) => {
 export const handleWebhook = async (req: Request, res: Response) => {
     try {
         const payload = req.body;
-        console.log('Webhook received:', JSON.stringify(payload, null, 2));
 
         const requestId = payload.request_id;
         if (!requestId) {
@@ -78,7 +76,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Missing request_id' });
         }
 
-        const job = getJob(requestId);
+        const job = await getJob(requestId);
         if (!job) {
             console.warn(`Webhook for unknown job: ${requestId}`);
             // Still acknowledge - might be from a previous server instance
@@ -91,19 +89,19 @@ export const handleWebhook = async (req: Request, res: Response) => {
             const images = payload.payload.images;
             const resultUrl = images && images.length > 0 ? images[0].url : null;
 
-            updateJob(requestId, {
+            await updateJob(requestId, {
                 status: 'COMPLETED',
-                resultUrl: resultUrl,
-                logs: payload.logs
+                result_url: resultUrl,
+                logs: payload.logs || null,
+                error: null
             });
-            console.log(`Job ${requestId} COMPLETED. Result: ${resultUrl}`);
         } else if (payload.error) {
-            // Failed
-            updateJob(requestId, {
+            // Failed - store error details
+            await updateJob(requestId, {
                 status: 'FAILED',
-                error: payload.error
+                error: String(payload.error),
+                logs: payload.logs || null
             });
-            console.log(`Job ${requestId} FAILED: ${payload.error}`);
         }
 
         res.status(200).json({ received: true });
@@ -131,15 +129,15 @@ export const getMakeupStatus = async (req: Request, res: Response) => {
             });
         }
 
-        // Check our job store first
-        const job = getJob(requestId);
+        // Check our database first
+        const job = await getJob(requestId);
 
         if (job) {
-            // If completed or failed, return from store
+            // If completed or failed, return from database
             if (job.status === 'COMPLETED' || job.status === 'FAILED') {
                 return res.json({
                     status: job.status,
-                    resultUrl: job.resultUrl,
+                    resultUrl: job.result_url,
                     error: job.error
                 });
             }
@@ -147,33 +145,36 @@ export const getMakeupStatus = async (req: Request, res: Response) => {
 
         // If not completed yet, poll Fal.ai directly (fallback for non-webhook mode)
         try {
-            const falStatus: any = await fal.queue.status("fal-ai/nano-banana/edit", {
+            const falStatus: { status: string; logs?: Array<{ message: string }> } = await fal.queue.status("fal-ai/nano-banana/edit", {
                 requestId: requestId,
                 logs: true
             });
 
-            console.log(`Job ${requestId} status from Fal.ai: ${falStatus.status}`);
+            // Map Fal.ai status to our status type
+            const mappedStatus: JobStatus = falStatus.status as JobStatus;
+            const logMessages = falStatus.logs?.map((l) => l.message) || null;
 
-            // Update our store
+            // Update our database
             if (job) {
-                updateJob(requestId, {
-                    status: falStatus.status,
-                    logs: falStatus.logs?.map((l: any) => l.message)
+                await updateJob(requestId, {
+                    status: mappedStatus,
+                    logs: logMessages
                 });
             }
 
             // If completed at Fal, fetch result
             if (falStatus.status === "COMPLETED") {
-                const result: any = await fal.queue.result("fal-ai/nano-banana/edit", {
+                const result: { data?: { images?: Array<{ url: string }> } } = await fal.queue.result("fal-ai/nano-banana/edit", {
                     requestId: requestId
                 });
 
                 const resultUrl = result.data?.images?.[0]?.url || null;
 
                 if (job) {
-                    updateJob(requestId, {
+                    await updateJob(requestId, {
                         status: 'COMPLETED',
-                        resultUrl: resultUrl
+                        result_url: resultUrl,
+                        error: null
                     });
                 }
 
@@ -186,12 +187,20 @@ export const getMakeupStatus = async (req: Request, res: Response) => {
             // Return current status
             return res.json({
                 status: falStatus.status,
-                logs: falStatus.logs?.map((l: any) => l.message)
+                logs: logMessages
             });
 
         } catch (falError) {
             console.error('Error fetching status from Fal.ai:', falError);
-            // Return what we have in store
+
+            // Store error in database
+            if (job) {
+                await updateJob(requestId, {
+                    error: String(falError)
+                });
+            }
+
+            // Return what we have in database
             if (job) {
                 return res.json({
                     status: job.status,

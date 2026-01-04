@@ -1,55 +1,101 @@
-// In-memory job store for tracking async Fal.ai jobs
-// For production, replace with Redis or a database
+// Supabase-based job store for tracking async Fal.ai jobs
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+dotenv.config();
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
-interface JobData {
-    requestId: string;
-    status: 'PENDING' | 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
-    resultUrl?: string;
-    prompt?: string;
-    createdAt: Date;
-    updatedAt: Date;
-    logs?: string[];
-    error?: string;
+if (!supabaseUrl || !supabaseKey) {
+    console.warn('SUPABASE_URL or SUPABASE_SERVICE_KEY not set. Job store will not work.');
 }
 
-const jobs: Map<string, JobData> = new Map();
+const supabase = createClient(supabaseUrl || '', supabaseKey || '');
 
-export const createJob = (requestId: string, prompt: string): JobData => {
-    const job: JobData = {
-        requestId,
-        status: 'PENDING',
-        prompt,
-        createdAt: new Date(),
-        updatedAt: new Date()
-    };
-    jobs.set(requestId, job);
-    return job;
-};
+// Type definitions
+export type JobStatus = 'PENDING' | 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
 
-export const getJob = (requestId: string): JobData | undefined => {
-    return jobs.get(requestId);
-};
+export interface JobData {
+    id?: string;
+    request_id: string;
+    status: JobStatus;
+    result_url?: string | null;
+    prompt?: string | null;
+    error?: string | null;
+    logs?: string[] | null;
+    created_at?: string;
+    updated_at?: string;
+}
 
-export const updateJob = (requestId: string, updates: Partial<JobData>): JobData | undefined => {
-    const job = jobs.get(requestId);
-    if (job) {
-        const updatedJob = { ...job, ...updates, updatedAt: new Date() };
-        jobs.set(requestId, updatedJob);
-        return updatedJob;
+// Create a new job
+export const createJob = async (requestId: string, prompt: string): Promise<JobData | null> => {
+    const { data, error } = await supabase
+        .from('jobs')
+        .insert({
+            request_id: requestId,
+            status: 'PENDING',
+            prompt: prompt
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error creating job:', error);
+        return null;
     }
-    return undefined;
+
+    return data;
 };
 
-export const deleteJob = (requestId: string): boolean => {
-    return jobs.delete(requestId);
-};
+// Get a job by request ID
+export const getJob = async (requestId: string): Promise<JobData | null> => {
+    const { data, error } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('request_id', requestId)
+        .single();
 
-// Cleanup old jobs (older than 1 hour) - call periodically
-export const cleanupOldJobs = (): void => {
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    for (const [id, job] of jobs.entries()) {
-        if (job.createdAt < oneHourAgo) {
-            jobs.delete(id);
+    if (error) {
+        if (error.code !== 'PGRST116') { // Not found is okay
+            console.error('Error getting job:', error);
         }
+        return null;
     }
+
+    return data;
+};
+
+// Update an existing job
+export const updateJob = async (
+    requestId: string,
+    updates: Partial<Omit<JobData, 'id' | 'request_id' | 'created_at'>>
+): Promise<JobData | null> => {
+    const { data, error } = await supabase
+        .from('jobs')
+        .update(updates)
+        .eq('request_id', requestId)
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error updating job:', error);
+        return null;
+    }
+
+    return data;
+};
+
+// Delete a job
+export const deleteJob = async (requestId: string): Promise<boolean> => {
+    const { error } = await supabase
+        .from('jobs')
+        .delete()
+        .eq('request_id', requestId);
+
+    if (error) {
+        console.error('Error deleting job:', error);
+        return false;
+    }
+
+    return true;
 };

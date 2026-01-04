@@ -77,7 +77,7 @@ const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ beforeImage, afterI
                 className="absolute top-0 bottom-0 w-1 bg-white cursor-col-resize z-20 flex items-center justify-center shadow-lg"
                 style={{ left: `${sliderPosition}%` }}
             >
-                <div className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center -ml-[14px] text-slate-800 transform hover:scale-110 transition-transform">
+                <div className="w-8 h-8 p-8 bg-white rounded-full shadow-md flex items-center justify-center -ml-[14px] text-slate-800 transform hover:scale-110 transition-transform">
                     <GripVertical  size={16} />
                 </div>
             </div>

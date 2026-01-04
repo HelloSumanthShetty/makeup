@@ -113,14 +113,6 @@ const Makeup = () => {
 
                 if (data.status === 'COMPLETED') {
                     if (data.resultUrl) {
-                        // Success!
-                        // For this demo we are just logging, but ideally we show the result.
-                        // I'll assume we wanted to swap the uploaded image or show a comparison.
-                        // Since I don't have a comparison view state yet, I'll just log it 
-                        // and maybe replace the uploadedImage to show the result? 
-                        // The user flow is "Edit Photo" -> modifies the photo. 
-                        // Let's replace the current view or just log for now as per previous code style.
-                        console.log("Makeup COMPLETED:", data.resultUrl);
                         setResultImage(data.resultUrl);
                         setSidebarMessage({ text: 'Image saved to gallery!', type: 'success' });
                     }
@@ -148,7 +140,6 @@ const Makeup = () => {
         setErrorMessage(null);
 
         const prompt = generateMakeupPrompt();
-        console.log("Generated Prompt:", prompt);
 
         try {
             // Step 1: Submit Job
@@ -172,13 +163,10 @@ const Makeup = () => {
             }
 
             if (data.mock) {
-                console.log("Mock success:", data);
                 return;
             }
 
             if (data.success && data.requestId) {
-                console.log("Job Submitted. Request ID:", data.requestId);
-                // Step 2: Poll for Status
                 await pollStatus(data.requestId);
             } else {
                 throw new Error(data.message || 'Failed to upload job');
