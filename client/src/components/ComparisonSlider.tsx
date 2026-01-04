@@ -50,23 +50,19 @@ const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ beforeImage, afterI
             onMouseDown={(e) => { onMouseDown(); handleMove(e.clientX); }}
             onTouchStart={(e) => { onTouchStart(); handleMove(e.touches[0].clientX); }}
         >
-            {/* After Image (Background) - Positioned absolutely to match */}
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
                 <img src={afterImage} alt="After" className="max-w-full max-h-full object-contain" />
             </div>
 
-            {/* Overlay Label (After) */}
             <div className="absolute top-4 right-4 bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full z-10 pointer-events-none">
                 After
             </div>
 
-            {/* Before Image (Clipped) */}
             <div
-                className="absolute inset-0 overflow-hidden flex items-center justify-center bg-gray-50 bg-white"
+                className="absolute inset-0 overflow-hidden flex items-center justify-center bg-gray-50 "
                 style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
             >
                 <img src={beforeImage} alt="Before" className="max-w-full max-h-full object-contain" />
-                {/* Overlay Label (Before) */}
                 <div className="absolute top-4 left-4 bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full z-10 pointer-events-none">
                     Before
                 </div>
@@ -77,8 +73,8 @@ const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ beforeImage, afterI
                 className="absolute top-0 bottom-0 w-1 bg-white cursor-col-resize z-20 flex items-center justify-center shadow-lg"
                 style={{ left: `${sliderPosition}%` }}
             >
-                <div className="w-8 h-8 p-8 bg-white rounded-full shadow-md flex items-center justify-center -ml-[14px] text-slate-800 transform hover:scale-110 transition-transform">
-                    <GripVertical  size={16} />
+                <div className="p-2  bg-white rounded-full shadow-md flex items-center justify-center -ml-[14px] text-slate-800 transform hover:scale-110 transition-transform">
+                    <GripVertical  size={25} />
                 </div>
             </div>
         </div>

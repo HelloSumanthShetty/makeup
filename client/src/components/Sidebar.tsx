@@ -1,4 +1,4 @@
-import { Home, Image as ImageIcon, Layers, Sparkles, Wand2, LogOut, MessageSquare, Heart, PenTool, LayoutGrid } from 'lucide-react';
+import { Home, Image as ImageIcon, Sparkles, Wand2, LogOut, MessageSquare, Heart, PenTool, LayoutGrid } from 'lucide-react';
 
 const Sidebar = () => {
     return (

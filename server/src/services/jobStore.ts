@@ -1,8 +1,8 @@
-// Supabase-based job store for tracking async Fal.ai jobs
+
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 dotenv.config();
-// Initialize Supabase client
+
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
@@ -12,7 +12,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl || '', supabaseKey || '');
 
-// Type definitions
+
 export type JobStatus = 'PENDING' | 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
 
 export interface JobData {
@@ -56,7 +56,7 @@ export const getJob = async (requestId: string): Promise<JobData | null> => {
         .single();
 
     if (error) {
-        if (error.code !== 'PGRST116') { // Not found is okay
+        if (error.code !== 'PGRST116') { 
             console.error('Error getting job:', error);
         }
         return null;
